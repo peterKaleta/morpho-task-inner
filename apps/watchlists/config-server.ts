@@ -1,3 +1,7 @@
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import {
   emptyStringToUndefined,
   type EnvSource,
@@ -8,7 +12,15 @@ import {
   z,
 } from "@pk-task/shared/text-helpers";
 
+const appDir = dirname(fileURLToPath(import.meta.url));
+
+loadEnvFile(resolve(appDir, ".env.local"));
+loadEnvFile(resolve(appDir, ".env"));
+
 export const configSchema = z.object({
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
   DATABASE_URL: urlString,
   REDIS_URL: optionalUrlString,
   UPSTASH_REDIS_REST_URL: optionalUrlString,
@@ -27,3 +39,41 @@ export function readEnv(env: EnvSource): Config {
 }
 
 export const config = readEnv(process.env);
+
+function loadEnvFile(path: string): void {
+  if (!existsSync(path)) {
+    return;
+  }
+
+  const lines = readFileSync(path, "utf8").split(/\r?\n/);
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine || trimmedLine.startsWith("#")) {
+      continue;
+    }
+
+    const separatorIndex = trimmedLine.indexOf("=");
+
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key = trimmedLine.slice(0, separatorIndex).trim();
+    const value = unquoteEnvValue(trimmedLine.slice(separatorIndex + 1).trim());
+
+    process.env[key] ??= value;
+  }
+}
+
+function unquoteEnvValue(value: string): string {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
+}

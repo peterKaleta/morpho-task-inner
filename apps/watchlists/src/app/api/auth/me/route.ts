@@ -1,6 +1,11 @@
-export async function GET() {
-  return Response.json(
-    { error: "Current user lookup is not implemented yet." },
-    { status: 501 },
-  );
+import { NextResponse } from "next/server";
+
+import { getCurrentUser } from "@/server/auth/current-user";
+
+export const runtime = "nodejs";
+
+export async function GET(request: Request) {
+  const user = await getCurrentUser(request);
+
+  return NextResponse.json({ user });
 }

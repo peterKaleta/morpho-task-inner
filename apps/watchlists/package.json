@@ -14,10 +14,14 @@
     "@pk-task/db": "workspace:*",
     "@pk-task/shared": "workspace:*",
     "@pk-task/ui": "workspace:*",
+    "@tanstack/react-query": "^5.100.9",
+    "connectkit": "^1.9.2",
     "lucide-react": "^0.468.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "viem": "^2.47.18",
+    "wagmi": "^2.19.5"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "latest",

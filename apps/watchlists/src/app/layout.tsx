@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Wallet } from "lucide-react";
 import { Button } from "@pk-task/ui/components/button";
 import { Providers } from "@/components/providers";
+import { AuthButtons } from "@/features/auth/auth-buttons";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,10 +36,7 @@ export default function RootLayout({
                       <Link href={item.href}>{item.label}</Link>
                     </Button>
                   ))}
-                  <Button variant="outline" size="sm">
-                    <Wallet className="size-4" aria-hidden="true" />
-                    Connect
-                  </Button>
+                  <AuthButtons />
                 </nav>
               </div>
             </header>
