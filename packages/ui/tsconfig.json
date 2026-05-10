@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@pk-task/ui/components/*": ["src/components/*"],
+      "@pk-task/ui/hooks/*": ["src/hooks/*"],
+      "@pk-task/ui/lib/*": ["src/lib/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}
