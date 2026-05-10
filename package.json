@@ -10,7 +10,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "db:generate": "pnpm --filter @pk-task/db db:generate",
-    "db:migrate": "pnpm --filter @pk-task/db db:migrate"
+    "db:migrate": "pnpm --filter @pk-task/db db:migrate",
+    "db:check": "pnpm --filter @pk-task/db db:check"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "latest",

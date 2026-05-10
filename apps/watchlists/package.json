@@ -12,6 +12,7 @@
   "dependencies": {
     "@pk-task/api": "workspace:*",
     "@pk-task/db": "workspace:*",
+    "@pk-task/shared": "workspace:*",
     "@pk-task/ui": "workspace:*",
     "lucide-react": "^0.468.0",
     "next": "latest",

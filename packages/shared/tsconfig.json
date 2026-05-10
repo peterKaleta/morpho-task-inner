@@ -3,5 +3,5 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "config.ts", "drizzle.config.ts", "load-env.ts"]
+  "include": ["src/**/*.ts"]
 }

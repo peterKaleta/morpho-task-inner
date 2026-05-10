@@ -5,6 +5,7 @@
     { "path": "./apps/watchlists" },
     { "path": "./packages/api" },
     { "path": "./packages/db" },
+    { "path": "./packages/shared" },
     { "path": "./packages/ui" }
   ]
 }
