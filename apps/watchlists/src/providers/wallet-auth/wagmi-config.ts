@@ -4,7 +4,7 @@ import { getDefaultConfig } from "connectkit";
 import { createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 
-import { config as clientConfig } from "../../config-client";
+import { config as clientConfig } from "../../../config-client";
 
 export function createWagmiConfig() {
   return createConfig(

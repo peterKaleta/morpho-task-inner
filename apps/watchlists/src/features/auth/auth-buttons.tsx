@@ -10,13 +10,13 @@ import { Button } from "@pk-task/ui/components/button";
 import { formatWalletAddress } from "@/helpers/format-wallet-address";
 import { isTransientWalletSigningError } from "@/helpers/wallet-signing-errors";
 import { useSession } from "@/providers/session-provider";
-import { WalletAuthProviders } from "@/providers/wallet-auth-providers";
+import { WalletAuthProvider } from "@/providers/wallet-auth/wallet-auth-provider";
 
 const AUTO_SIGN_DELAY_MS = 400;
 
 export function AuthButtons() {
   return (
-    <WalletAuthProviders
+    <WalletAuthProvider
       fallback={
         <Button variant="outline" size="sm" disabled>
           <Wallet className="size-4" aria-hidden="true" />
@@ -25,7 +25,7 @@ export function AuthButtons() {
       }
     >
       <AuthButtonControls />
-    </WalletAuthProviders>
+    </WalletAuthProvider>
   );
 }
 

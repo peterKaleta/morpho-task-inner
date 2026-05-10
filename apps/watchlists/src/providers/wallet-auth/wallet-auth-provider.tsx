@@ -4,9 +4,9 @@ import { ConnectKitProvider } from "connectkit";
 import { useEffect, useState } from "react";
 import { WagmiProvider, type Config } from "wagmi";
 
-import { createWagmiConfig } from "@/components/wagmi-config";
+import { createWagmiConfig } from "./wagmi-config";
 
-export function WalletAuthProviders({
+export function WalletAuthProvider({
   children,
   fallback,
 }: {
