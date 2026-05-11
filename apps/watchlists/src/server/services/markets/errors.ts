@@ -1,3 +1,5 @@
+import { ApplicationError } from "@/server/errors";
+
 export type MorphoGraphqlError = {
   message?: string;
   locations?: Array<{
@@ -8,7 +10,9 @@ export type MorphoGraphqlError = {
   extensions?: Record<string, unknown>;
 };
 
-export class MorphoApiError extends Error {
+export class MorphoApiError extends ApplicationError {
+  readonly upstreamMessage: string;
+
   constructor(
     message: string,
     readonly options: {
@@ -17,8 +21,14 @@ export class MorphoApiError extends Error {
       cause?: unknown;
     } = {},
   ) {
-    super(message, { cause: options.cause });
+    super("Unable to load Morpho market data right now.", {
+      cause: options.cause,
+      code: "MORPHO_MARKET_DATA_ERROR",
+      details: options.graphqlErrors,
+      status: options.status,
+    });
     this.name = "MorphoApiError";
+    this.upstreamMessage = message;
   }
 }
 

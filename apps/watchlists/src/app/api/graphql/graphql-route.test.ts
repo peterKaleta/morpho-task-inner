@@ -38,6 +38,7 @@ describe("GraphQL market endpoint", () => {
   afterEach(() => {
     vi.doUnmock("@/server/services/auth/current-user");
     vi.doUnmock("@/server/services/markets/service");
+    vi.doUnmock("@/server/services/watchlists");
     vi.unstubAllEnvs();
     vi.resetModules();
   });
@@ -211,6 +212,338 @@ describe("GraphQL market endpoint", () => {
   });
 });
 
+describe("GraphQL watchlist endpoint", () => {
+  beforeEach(() => {
+    vi.stubEnv("DATABASE_URL", "postgres://user:pass@localhost:5432/test");
+    vi.stubEnv("MORPHO_API_URL", "https://api.morpho.org/graphql");
+    vi.stubEnv(
+      "SESSION_SECRET",
+      "test-session-secret-with-at-least-32-characters",
+    );
+  });
+
+  afterEach(() => {
+    vi.doUnmock("@/server/services/auth/current-user");
+    vi.doUnmock("@/server/services/markets/service");
+    vi.doUnmock("@/server/services/watchlists");
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("rejects unauthenticated watchlist reads", async () => {
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => null),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(),
+      getMorphoMarkets: vi.fn(),
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      listUserWatchlists: vi.fn(),
+    }));
+
+    const response = await postGraphql(`
+      query {
+        myWatchlists {
+          id
+        }
+      }
+    `);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data).toBeNull();
+    expect(body.errors[0].extensions.code).toBe("UNAUTHENTICATED");
+  });
+
+  it("returns watchlists for the signed-in user", async () => {
+    const listUserWatchlists = vi.fn(async () => [
+      {
+        id: "00000000-0000-4000-8000-000000000101",
+        name: "Blue chips",
+        description: "Main markets",
+        itemCount: 2,
+        createdAt: "2026-05-11T08:00:00.000Z",
+        updatedAt: "2026-05-11T08:00:00.000Z",
+      },
+    ]);
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => currentUser),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(),
+      getMorphoMarkets: vi.fn(),
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      listUserWatchlists,
+    }));
+
+    const response = await postGraphql(`
+      query {
+        myWatchlists {
+          id
+          name
+          itemCount
+        }
+      }
+    `);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.myWatchlists).toEqual([
+      {
+        id: "00000000-0000-4000-8000-000000000101",
+        name: "Blue chips",
+        itemCount: 2,
+      },
+    ]);
+    expect(listUserWatchlists).toHaveBeenCalledWith(currentUser.id);
+  });
+
+  it("hydrates saved markets without failing unavailable rows", async () => {
+    const getUserWatchlist = vi.fn(async () => ({
+      id: "00000000-0000-4000-8000-000000000101",
+      name: "Blue chips",
+      description: null,
+      createdAt: "2026-05-11T08:00:00.000Z",
+      updatedAt: "2026-05-11T08:00:00.000Z",
+      items: [
+        {
+          id: "00000000-0000-4000-8000-000000000201",
+          watchlistId: "00000000-0000-4000-8000-000000000101",
+          marketUniqueKey: "0xmarket",
+          createdAt: "2026-05-11T08:00:00.000Z",
+        },
+        {
+          id: "00000000-0000-4000-8000-000000000202",
+          watchlistId: "00000000-0000-4000-8000-000000000101",
+          marketUniqueKey: "0xmissing",
+          createdAt: "2026-05-11T08:01:00.000Z",
+        },
+      ],
+    }));
+    const getMorphoMarket = vi.fn(async (marketId: string) => {
+      if (marketId === "0xmarket") {
+        return market;
+      }
+
+      throw new Error("Unavailable");
+    });
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => currentUser),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket,
+      getMorphoMarkets: vi.fn(),
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      getUserWatchlist,
+    }));
+
+    const response = await postGraphql(
+      `
+        query Watchlist($id: ID!) {
+          watchlist(id: $id) {
+            id
+            items {
+              marketUniqueKey
+              market {
+                marketId
+              }
+            }
+          }
+        }
+      `,
+      { id: "00000000-0000-4000-8000-000000000101" },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.watchlist.items).toEqual([
+      {
+        marketUniqueKey: "0xmarket",
+        market: {
+          marketId: "0xmarket",
+        },
+      },
+      {
+        marketUniqueKey: "0xmissing",
+        market: null,
+      },
+    ]);
+    expect(getUserWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+    });
+  });
+
+  it("creates watchlists for the signed-in user", async () => {
+    const createWatchlist = vi.fn(async () => ({
+      id: "00000000-0000-4000-8000-000000000101",
+      name: "New list",
+      description: null,
+      itemCount: 0,
+      createdAt: "2026-05-11T08:00:00.000Z",
+      updatedAt: "2026-05-11T08:00:00.000Z",
+    }));
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => currentUser),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(),
+      getMorphoMarkets: vi.fn(),
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      createWatchlist,
+    }));
+
+    const response = await postGraphql(
+      `
+        mutation CreateWatchlist($input: CreateWatchlistInput!) {
+          createWatchlist(input: $input) {
+            id
+            name
+            itemCount
+          }
+        }
+      `,
+      { input: { name: "New list", description: "" } },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.createWatchlist).toEqual({
+      id: "00000000-0000-4000-8000-000000000101",
+      name: "New list",
+      itemCount: 0,
+    });
+    expect(createWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      name: "New list",
+      description: "",
+    });
+  });
+
+  it("updates, deletes, adds, and removes through watchlist mutations", async () => {
+    const updateWatchlist = vi.fn(async () => ({
+      id: "00000000-0000-4000-8000-000000000101",
+      name: "Edited",
+      description: "Updated",
+      itemCount: 1,
+      createdAt: "2026-05-11T08:00:00.000Z",
+      updatedAt: "2026-05-11T09:00:00.000Z",
+    }));
+    const deleteWatchlist = vi.fn(async () => ({
+      deletedId: "00000000-0000-4000-8000-000000000101",
+    }));
+    const addMarketToWatchlist = vi.fn(async () => ({
+      id: "00000000-0000-4000-8000-000000000201",
+      marketUniqueKey: "0xmarket",
+      createdAt: "2026-05-11T08:00:00.000Z",
+    }));
+    const removeMarketFromWatchlist = vi.fn(async () => ({
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+      marketUniqueKey: "0xmarket",
+    }));
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => currentUser),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(async () => market),
+      getMorphoMarkets: vi.fn(),
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      addMarketToWatchlist,
+      deleteWatchlist,
+      removeMarketFromWatchlist,
+      updateWatchlist,
+    }));
+
+    const response = await postGraphql(
+      `
+        mutation AllWatchlistMutations(
+          $update: UpdateWatchlistInput!
+          $deleteId: ID!
+          $add: AddMarketToWatchlistInput!
+          $remove: RemoveMarketFromWatchlistInput!
+        ) {
+          updateWatchlist(input: $update) {
+            name
+          }
+          deleteWatchlist(id: $deleteId) {
+            deletedId
+          }
+          addMarketToWatchlist(input: $add) {
+            marketUniqueKey
+            market {
+              marketId
+            }
+          }
+          removeMarketFromWatchlist(input: $remove) {
+            marketUniqueKey
+          }
+        }
+      `,
+      {
+        update: {
+          id: "00000000-0000-4000-8000-000000000101",
+          name: "Edited",
+          description: "Updated",
+        },
+        deleteId: "00000000-0000-4000-8000-000000000101",
+        add: {
+          watchlistId: "00000000-0000-4000-8000-000000000101",
+          marketUniqueKey: "0xmarket",
+        },
+        remove: {
+          watchlistId: "00000000-0000-4000-8000-000000000101",
+          marketUniqueKey: "0xmarket",
+        },
+      },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.updateWatchlist.name).toBe("Edited");
+    expect(body.data.deleteWatchlist.deletedId).toBe(
+      "00000000-0000-4000-8000-000000000101",
+    );
+    expect(body.data.addMarketToWatchlist).toEqual({
+      marketUniqueKey: "0xmarket",
+      market: {
+        marketId: "0xmarket",
+      },
+    });
+    expect(body.data.removeMarketFromWatchlist.marketUniqueKey).toBe(
+      "0xmarket",
+    );
+    expect(updateWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+      name: "Edited",
+      description: "Updated",
+    });
+    expect(deleteWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+    });
+    expect(addMarketToWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+      marketUniqueKey: "0xmarket",
+    });
+    expect(removeMarketFromWatchlist).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      watchlistId: "00000000-0000-4000-8000-000000000101",
+      marketUniqueKey: "0xmarket",
+    });
+  });
+});
+
 describe("GraphQL context", () => {
   afterEach(() => {
     vi.doUnmock("@/server/services/auth/current-user");
@@ -269,3 +602,8 @@ async function postGraphql(
     }),
   );
 }
+
+const currentUser = {
+  id: "00000000-0000-4000-8000-000000000001",
+  walletAddress: "0x0000000000000000000000000000000000000001",
+};

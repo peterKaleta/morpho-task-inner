@@ -1,6 +1,16 @@
 type Query {
   markets(search: String, first: Int, skip: Int): [Market!]!
   market(marketId: ID!): Market
+  myWatchlists: [WatchlistSummary!]!
+  watchlist(id: ID!): Watchlist
+}
+
+type Mutation {
+  createWatchlist(input: CreateWatchlistInput!): WatchlistSummary!
+  updateWatchlist(input: UpdateWatchlistInput!): WatchlistSummary!
+  deleteWatchlist(id: ID!): DeleteWatchlistPayload!
+  addMarketToWatchlist(input: AddMarketToWatchlistInput!): WatchlistItem!
+  removeMarketFromWatchlist(input: RemoveMarketFromWatchlistInput!): RemoveMarketFromWatchlistPayload!
 }
 
 type Market {
@@ -28,4 +38,59 @@ type MarketState {
   borrowApy: Float
   totalMarketSize: String
   totalLiquidity: String
+}
+
+type WatchlistSummary {
+  id: ID!
+  name: String!
+  description: String
+  itemCount: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Watchlist {
+  id: ID!
+  name: String!
+  description: String
+  items: [WatchlistItem!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type WatchlistItem {
+  id: ID!
+  marketUniqueKey: ID!
+  market: Market
+  createdAt: String!
+}
+
+input CreateWatchlistInput {
+  name: String!
+  description: String
+}
+
+input UpdateWatchlistInput {
+  id: ID!
+  name: String!
+  description: String
+}
+
+input AddMarketToWatchlistInput {
+  watchlistId: ID!
+  marketUniqueKey: ID!
+}
+
+input RemoveMarketFromWatchlistInput {
+  watchlistId: ID!
+  marketUniqueKey: ID!
+}
+
+type DeleteWatchlistPayload {
+  deletedId: ID!
+}
+
+type RemoveMarketFromWatchlistPayload {
+  watchlistId: ID!
+  marketUniqueKey: ID!
 }

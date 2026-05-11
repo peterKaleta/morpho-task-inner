@@ -8,10 +8,8 @@ import { createWagmiConfig } from "./wagmi-config";
 
 export function WalletAuthProvider({
   children,
-  fallback,
 }: {
   children: React.ReactNode;
-  fallback: React.ReactNode;
 }) {
   const [wagmiConfig, setWagmiConfig] = useState<Config | null>(null);
 
@@ -20,7 +18,7 @@ export function WalletAuthProvider({
   }, []);
 
   if (!wagmiConfig) {
-    return fallback;
+    return null;
   }
 
   return (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppQueryClientProvider } from "@/providers/query-client-provider";
 import { SessionProvider } from "@/providers/session-provider";
+import { WalletAuthProvider } from "@/providers/wallet-auth/wallet-auth-provider";
 import { Shell } from "@/shell";
 import "./globals.css";
 
@@ -18,9 +19,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body>
         <AppQueryClientProvider>
-          <SessionProvider>
-            <Shell>{children}</Shell>
-          </SessionProvider>
+          <WalletAuthProvider>
+            <SessionProvider>
+              <Shell>{children}</Shell>
+            </SessionProvider>
+          </WalletAuthProvider>
         </AppQueryClientProvider>
       </body>
     </html>

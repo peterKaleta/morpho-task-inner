@@ -1,15 +1,21 @@
 import { GraphQLError } from "graphql";
 
-import { isMorphoApiError } from "@/server/services/markets/errors";
-
-export const MORPHO_MARKET_DATA_ERROR_CODE = "MORPHO_MARKET_DATA_ERROR";
+import { isApplicationError } from "@/server/errors";
 
 export function toGraphqlError(error: unknown): GraphQLError {
-  if (isMorphoApiError(error)) {
-    return new GraphQLError("Unable to load Morpho market data right now.", {
+  if (isApplicationError(error)) {
+    const extensions: Record<string, unknown> = {
+      code: error.code,
+      status: error.status,
+    };
+
+    if (error.details) {
+      extensions.details = error.details;
+    }
+
+    return new GraphQLError(error.message, {
       extensions: {
-        code: MORPHO_MARKET_DATA_ERROR_CODE,
-        status: error.options.status,
+        ...extensions,
       },
       originalError: error,
     });

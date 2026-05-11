@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   ArrowUpRight,
+  BookmarkPlus,
   ChevronLeft,
   ChevronRight,
   RefreshCw,
@@ -22,6 +23,7 @@ import {
   CardContent,
 } from "@pk-task/ui/components/card";
 import { Input } from "@pk-task/ui/components/input";
+import { AddToWatchlistDialog } from "@/features/watchlists/add-to-watchlist-dialog";
 
 import {
   formatAssetAmount,
@@ -238,14 +240,31 @@ function MarketTable({ markets }: { markets: Market[] }) {
                 )}
               </td>
               <td className="p-3 text-right">
-                <Button asChild variant="ghost" size="icon">
-                  <Link
-                    href={`/markets/${encodeURIComponent(market.marketId)}`}
-                    aria-label={`Open ${market.marketId}`}
+                <div className="flex justify-end gap-1">
+                  <AddToWatchlistDialog
+                    marketId={market.marketId}
+                    marketLabel={formatMarketPair(
+                      market.loanAsset?.symbol,
+                      market.collateralAsset?.symbol,
+                    )}
                   >
-                    <ArrowUpRight className="size-4" aria-hidden="true" />
-                  </Link>
-                </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Add ${market.marketId} to watchlist`}
+                    >
+                      <BookmarkPlus className="size-4" aria-hidden="true" />
+                    </Button>
+                  </AddToWatchlistDialog>
+                  <Button asChild variant="ghost" size="icon">
+                    <Link
+                      href={`/markets/${encodeURIComponent(market.marketId)}`}
+                      aria-label={`Open ${market.marketId}`}
+                    >
+                      <ArrowUpRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}

@@ -20,6 +20,7 @@ import {
   formatMarketPair,
   formatPercent,
 } from "./formatters";
+import { AddToWatchlistDialog } from "@/features/watchlists/add-to-watchlist-dialog";
 
 export function MarketDetailClient({ marketId }: { marketId: string }) {
   const marketQuery = useMarketQuery(marketId);
@@ -99,10 +100,18 @@ function MarketDetailCard({ market }: { market: Market }) {
             )}
           />
         </div>
-        <Button disabled>
-          <BookmarkPlus className="size-4" aria-hidden="true" />
-          Add to watchlist
-        </Button>
+        <AddToWatchlistDialog
+          marketId={market.marketId}
+          marketLabel={formatMarketPair(
+            market.loanAsset?.symbol,
+            market.collateralAsset?.symbol,
+          )}
+        >
+          <Button>
+            <BookmarkPlus className="size-4" aria-hidden="true" />
+            Add to watchlist
+          </Button>
+        </AddToWatchlistDialog>
       </CardContent>
     </Card>
   );
