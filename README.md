@@ -20,26 +20,41 @@ The V1 scope is intentionally focused: market browsing, wallet-based authenticat
 
 ## Repository Structure
 
-- `apps/watchlists`: Next.js application containing the frontend, REST auth route handlers, GraphQL endpoint, and server-side feature modules.
-- `apps/watchlists/src/app`: App Router pages, layouts, loading states, error boundaries, and API route handlers.
-- `apps/watchlists/src/app/api/auth`: REST wallet auth routes for nonce, verify, logout, and current user.
-- `apps/watchlists/src/app/api/graphql`: GraphQL Yoga route handler.
-- `apps/watchlists/src/app/markets`: market list and market detail routes.
-- `apps/watchlists/src/app/watchlists`: watchlist index and watchlist detail routes.
-- `apps/watchlists/src/features/markets`: market UI components and formatting helpers.
-- `apps/watchlists/src/features/watchlists`: watchlist UI components, forms, dialogs, and states.
-- `apps/watchlists/src/providers`: app-level React providers for wallet auth and TanStack Query.
-- `apps/watchlists/src/server/graphql`: Yoga schema, resolvers, context creation, and GraphQL error mapping.
-- `apps/watchlists/src/server/services/auth`: wallet nonce verification, signed cookie session helpers, validation, and current-user lookup.
-- `apps/watchlists/src/server/services/markets`: typed Morpho API client, upstream query documents, and app-facing market service methods.
-- `apps/watchlists/src/server/services/watchlists`: watchlist validation, repository, and service logic.
-- `apps/watchlists/src/server/cache`: Redis cache wrappers and cache key helpers.
-- `packages/api`: shared frontend API package for REST auth hooks, GraphQL documents, clients, query keys, and TanStack Query hooks.
-- `packages/db`: Drizzle schema, database client, migrations, config, and database health check.
-- `packages/shared`: shared helpers used across app and package boundaries.
-- `packages/ui`: shared shadcn/ui components, hooks, and UI utilities.
-- `docs`: architecture diagram and product/business documentation.
-- `docker-compose.yml`: local Postgres and Redis services for development.
+```text
+.
+├── apps/
+│   └── watchlists/
+│       ├── src/
+│       │   ├── app/                         Next.js App Router pages, layouts, and route handlers
+│       │   │   ├── api/
+│       │   │   │   ├── auth/                REST wallet auth routes: nonce, verify, logout, me
+│       │   │   │   └── graphql/             GraphQL Yoga endpoint
+│       │   │   ├── markets/                 Market list and market detail routes
+│       │   │   └── watchlists/              Watchlist index and watchlist detail routes
+│       │   ├── features/
+│       │   │   ├── markets/                 Market UI components and formatting helpers
+│       │   │   └── watchlists/              Watchlist UI components, forms, dialogs, and states
+│       │   ├── providers/                   Wallet auth and TanStack Query providers
+│       │   └── server/
+│       │       ├── cache/                    Redis cache wrappers and cache key helpers
+│       │       ├── graphql/                 Yoga schema, resolvers, context, and error mapping
+│       │       └── services/
+│       │           ├── auth/                 Nonces, signed cookie sessions, validation, current user
+│       │           ├── markets/              Morpho API client, query documents, market services
+│       │           └── watchlists/           Watchlist validation, repository, and service logic
+│       ├── config-client.ts                  Public client env validation
+│       ├── config-server.ts                  Server env validation and env file loading
+│       └── package.json
+├── packages/
+│   ├── api/                                  Shared frontend API clients, documents, hooks, query keys
+│   ├── db/                                   Drizzle schema, client, migrations, config, health check
+│   ├── shared/                               Shared helpers used across workspace boundaries
+│   └── ui/                                   Shared shadcn/ui components, hooks, and utilities
+├── docs/                                     Architecture diagram and product/business documentation
+├── docker-compose.yml                        Local Postgres and Redis services
+├── pnpm-workspace.yaml                       Workspace package definitions
+└── package.json                              Root scripts for dev, build, lint, test, typecheck, db tasks
+```
 
 ## Architecture
 
@@ -187,4 +202,3 @@ The app is intended to deploy to Vercel.
 - Add historical charts and deeper market analytics.
 - Add observability for production errors and cache behavior.
 - Split the backend into a dedicated service if the app grows beyond the task scope.
-
