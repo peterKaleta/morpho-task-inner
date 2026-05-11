@@ -19,6 +19,7 @@ import {
 } from "@pk-task/ui/components/dialog";
 import { Input } from "@pk-task/ui/components/input";
 import { Label } from "@pk-task/ui/components/label";
+import { toast } from "@pk-task/ui/components/sonner";
 import { Textarea } from "@pk-task/ui/components/textarea";
 
 export function WatchlistFormDialog({
@@ -73,10 +74,18 @@ export function WatchlistFormDialog({
           ).updateWatchlist
         : (await createWatchlist.mutateAsync(input)).createWatchlist;
 
+      toast.success(isEditing ? "Watchlist updated" : "Watchlist created", {
+        description: `${savedWatchlist.name} is ready.`,
+      });
       onCompleted?.(savedWatchlist);
       setIsOpen(false);
     } catch (caughtError) {
-      setError(getErrorMessage(caughtError));
+      const message = getErrorMessage(caughtError);
+
+      setError(message);
+      toast.error("Could not save watchlist", {
+        description: message,
+      });
     }
   }
 

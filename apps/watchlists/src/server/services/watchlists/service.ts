@@ -2,6 +2,10 @@ import { getDb, type Database } from "@pk-task/db";
 import { z } from "@pk-task/shared/text-helpers";
 
 import { ApplicationValidationError } from "@/server/errors";
+import {
+  POSTGRES_UNIQUE_VIOLATION_CODE,
+  WATCHLIST_NAME_UNIQUE_CONSTRAINT,
+} from "./constants";
 import { WatchlistError } from "./errors";
 import {
   addMarketToWatchlistInputSchema,
@@ -197,7 +201,7 @@ function mapRepositoryError(error: unknown): Error {
     return error;
   }
 
-  if (isUniqueConstraintError(error)) {
+  if (isWatchlistNameUniqueConstraintError(error)) {
     return new WatchlistError(
       "A watchlist with this name already exists.",
       "WATCHLIST_NAME_TAKEN",
@@ -208,13 +212,45 @@ function mapRepositoryError(error: unknown): Error {
   return error instanceof Error ? error : new Error("Watchlist operation failed.");
 }
 
-function isUniqueConstraintError(error: unknown): boolean {
+function isWatchlistNameUniqueConstraintError(error: unknown): boolean {
+  for (const currentError of walkErrorCauses(error)) {
+    if (!isDatabaseErrorShape(currentError)) {
+      continue;
+    }
+
+    return isWatchlistNameUniqueConstraint(currentError);
+  }
+
+  return false;
+}
+
+function isWatchlistNameUniqueConstraint(error: {
+  code?: unknown;
+  constraint?: unknown;
+  constraint_name?: unknown;
+}): boolean {
   return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "23505"
+    error.code === POSTGRES_UNIQUE_VIOLATION_CODE &&
+    (error.constraint_name === WATCHLIST_NAME_UNIQUE_CONSTRAINT ||
+      error.constraint === WATCHLIST_NAME_UNIQUE_CONSTRAINT)
   );
+}
+
+function* walkErrorCauses(error: unknown): Generator<unknown> {
+  let currentError = error;
+
+  while (currentError && typeof currentError === "object") {
+    yield currentError;
+    currentError = "cause" in currentError ? currentError.cause : undefined;
+  }
+}
+
+function isDatabaseErrorShape(error: unknown): error is {
+  code?: unknown;
+  constraint?: unknown;
+  constraint_name?: unknown;
+} {
+  return typeof error === "object" && error !== null && "code" in error;
 }
 
 function parseWatchlistInput<TSchema extends z.ZodType>(

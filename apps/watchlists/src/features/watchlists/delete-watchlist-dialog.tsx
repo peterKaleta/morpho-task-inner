@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@pk-task/ui/components/alert-dialog";
+import { toast } from "@pk-task/ui/components/sonner";
 
 export function DeleteWatchlistDialog({
   children,
@@ -35,14 +36,21 @@ export function DeleteWatchlistDialog({
 
     try {
       await deleteWatchlist.mutateAsync(watchlistId);
+      toast.success("Watchlist deleted", {
+        description: `${name} was removed from your active lists.`,
+      });
       setOpen(false);
       onDeleted?.();
     } catch (caughtError) {
-      setError(
+      const message =
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not delete this watchlist.",
-      );
+          : "Could not delete this watchlist.";
+
+      setError(message);
+      toast.error("Could not delete watchlist", {
+        description: message,
+      });
     }
   }
 
