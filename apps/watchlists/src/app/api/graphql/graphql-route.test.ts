@@ -120,6 +120,44 @@ describe("GraphQL market endpoint", () => {
     });
   });
 
+  it("supports GET requests with encoded GraphQL query params", async () => {
+    const getMorphoMarkets = vi.fn(async () => [market]);
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => null),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(),
+      getMorphoMarkets,
+    }));
+
+    const response = await getGraphql(
+      `
+        query Markets($first: Int, $skip: Int) {
+          markets(first: $first, skip: $skip) {
+            marketId
+          }
+        }
+      `,
+      { first: 20, skip: 0 },
+      "Markets",
+    );
+    const body = await response.json();
+
+    expect(response).toBeInstanceOf(Response);
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.markets).toEqual([
+      {
+        marketId: "0xmarket",
+      },
+    ]);
+    expect(getMorphoMarkets).toHaveBeenCalledWith({
+      first: 20,
+      search: undefined,
+      skip: 0,
+    });
+  });
+
   it("returns market detail from the Morpho service", async () => {
     const getMorphoMarket = vi.fn(async () => market);
     vi.doMock("@/server/services/auth/current-user", () => ({
@@ -640,6 +678,31 @@ async function postGraphql(
         query,
         variables,
       }),
+    }),
+  );
+}
+
+async function getGraphql(
+  query: string,
+  variables?: Record<string, unknown>,
+  operationName?: string,
+): Promise<Response> {
+  const { GET } = await import("./route");
+  const url = new URL("http://localhost/api/graphql");
+
+  url.searchParams.set("query", query);
+
+  if (variables) {
+    url.searchParams.set("variables", JSON.stringify(variables));
+  }
+
+  if (operationName) {
+    url.searchParams.set("operationName", operationName);
+  }
+
+  return GET(
+    new Request(url, {
+      method: "GET",
     }),
   );
 }
