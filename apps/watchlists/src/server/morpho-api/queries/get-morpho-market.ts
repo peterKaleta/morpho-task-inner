@@ -23,10 +23,8 @@ export const GET_MORPHO_MARKET_QUERY = /* GraphQL */ `
         state {
           supplyApy
           borrowApy
-          utilization
-          liquidityAssetsUsd
-          supplyAssetsUsd
-          borrowAssetsUsd
+          totalMarketSize: supplyAssets
+          totalLiquidity: liquidityAssets
         }
       }
     }

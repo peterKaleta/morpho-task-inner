@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { requestJson } from "@/api-client/helpers";
+import { requestJson } from "./client";
 import type { AuthMeResponse } from "./types";
 
 export const authMeQueryKey = ["auth", "me"] as const;

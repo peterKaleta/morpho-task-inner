@@ -1,0 +1,31 @@
+type Query {
+  markets(search: String, first: Int, skip: Int): [Market!]!
+  market(marketId: ID!): Market
+}
+
+type Market {
+  marketId: ID!
+  chain: MarketChain
+  loanAsset: MarketAsset
+  collateralAsset: MarketAsset
+  lltv: String
+  state: MarketState
+}
+
+type MarketChain {
+  id: Int
+  network: String
+}
+
+type MarketAsset {
+  address: String
+  symbol: String
+  decimals: Int
+}
+
+type MarketState {
+  supplyApy: Float
+  borrowApy: Float
+  totalMarketSize: String
+  totalLiquidity: String
+}

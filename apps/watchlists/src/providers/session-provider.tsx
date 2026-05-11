@@ -8,11 +8,13 @@ import {
   useState,
 } from "react";
 
-import { useAuthMe } from "@/api-client/auth/useAuthMe";
-import { useCreateAuthNonce } from "@/api-client/auth/useCreateAuthNonce";
-import { useLogoutAuth } from "@/api-client/auth/useLogoutAuth";
-import { useVerifyAuth } from "@/api-client/auth/useVerifyAuth";
-import type { AuthUser } from "@/api-client/auth/types";
+import {
+  type AuthUser,
+  useAuthMe,
+  useCreateAuthNonce,
+  useLogoutAuth,
+  useVerifyAuth,
+} from "@pk-task/api/auth";
 import { isTransientWalletSigningError } from "@/helpers/wallet-signing-errors";
 
 export type SessionUser = {

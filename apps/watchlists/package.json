@@ -16,6 +16,8 @@
     "@pk-task/ui": "workspace:*",
     "@tanstack/react-query": "^5.100.9",
     "connectkit": "^1.9.2",
+    "graphql": "^16.14.0",
+    "graphql-yoga": "^5.21.0",
     "lucide-react": "^0.468.0",
     "next": "latest",
     "react": "latest",

@@ -18,14 +18,12 @@ const market = {
     symbol: "WETH",
     decimals: 18,
   },
-  lltv: 0.86,
+  lltv: "860000000000000000",
   state: {
     supplyApy: 0.04,
     borrowApy: 0.07,
-    utilization: 0.6,
-    liquidityAssetsUsd: 100,
-    supplyAssetsUsd: 200,
-    borrowAssetsUsd: 120,
+    totalLiquidity: "100000000",
+    totalMarketSize: "200000000",
   },
 };
 
@@ -43,14 +41,19 @@ describe("Morpho service methods", () => {
 
   it("returns normalized market summaries", async () => {
     const { getMorphoMarkets } = await import("./get-morpho-markets");
-    const fetchMock = vi.fn(async () =>
-      Response.json({
-        data: {
-          markets: {
-            items: [market],
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        void input;
+        void init;
+
+        return Response.json({
+          data: {
+            markets: {
+              items: [market],
+            },
           },
-        },
-      }),
+        });
+      },
     );
 
     await expect(
@@ -61,10 +64,41 @@ describe("Morpho service methods", () => {
       expect.objectContaining({
         marketId: "0xmarket",
         state: expect.objectContaining({
-          supplyAssetsUsd: 200,
+          totalMarketSize: "200000000",
         }),
       }),
     ]);
+  });
+
+  it("passes normalized search text to the market list query", async () => {
+    const { getMorphoMarkets } = await import("./get-morpho-markets");
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        void input;
+        void init;
+
+        return Response.json({
+          data: {
+            markets: {
+              items: [market],
+            },
+          },
+        });
+      },
+    );
+
+    await getMorphoMarkets({
+      fetchFn: fetchMock as typeof fetch,
+      search: "  usdc  ",
+    });
+
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+
+    expect(JSON.parse(init?.body as string).variables).toEqual({
+      first: 100,
+      search: "usdc",
+      skip: 0,
+    });
   });
 
   it("returns a normalized market detail", async () => {
@@ -87,8 +121,8 @@ describe("Morpho service methods", () => {
       expect.objectContaining({
         marketId: "0xmarket",
         state: expect.objectContaining({
-          supplyAssetsUsd: 200,
-          borrowAssetsUsd: 120,
+          borrowApy: 0.07,
+          totalLiquidity: "100000000",
         }),
       }),
     );

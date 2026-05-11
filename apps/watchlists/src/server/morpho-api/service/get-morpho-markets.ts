@@ -11,13 +11,15 @@ import type { MarketSummary } from "../types";
 
 export type GetMorphoMarketsOptions = RequestMorphoGraphqlOptions & {
   first?: number;
+  search?: string | null;
   skip?: number;
 };
 
 export async function getMorphoMarkets(
   options: GetMorphoMarketsOptions = {},
 ): Promise<MarketSummary[]> {
-  const { first = 100, skip = 0, ...requestOptions } = options;
+  const { first = 100, search, skip = 0, ...requestOptions } = options;
+  const normalizedSearch = search?.trim() || undefined;
   const data = await requestMorphoGraphql<
     GetMorphoMarketsData,
     GetMorphoMarketsVariables
@@ -25,6 +27,7 @@ export async function getMorphoMarkets(
     GET_MORPHO_MARKETS_QUERY,
     {
       first,
+      search: normalizedSearch,
       skip,
     },
     requestOptions,

@@ -1,10 +1,11 @@
 import type { MorphoMarketFields } from "./types";
 
 export const GET_MORPHO_MARKETS_QUERY = /* GraphQL */ `
-  query GetMorphoMarkets($first: Int!, $skip: Int!) {
+  query GetMorphoMarkets($first: Int!, $skip: Int!, $search: String) {
     markets(
       first: $first
       skip: $skip
+      where: { search: $search }
       orderBy: SupplyAssetsUsd
       orderDirection: Desc
     ) {
@@ -28,10 +29,8 @@ export const GET_MORPHO_MARKETS_QUERY = /* GraphQL */ `
         state {
           supplyApy
           borrowApy
-          utilization
-          liquidityAssetsUsd
-          supplyAssetsUsd
-          borrowAssetsUsd
+          totalMarketSize: supplyAssets
+          totalLiquidity: liquidityAssets
         }
       }
     }
@@ -41,6 +40,7 @@ export const GET_MORPHO_MARKETS_QUERY = /* GraphQL */ `
 export type GetMorphoMarketsVariables = {
   first: number;
   skip: number;
+  search?: string;
 };
 
 export type GetMorphoMarketsData = {

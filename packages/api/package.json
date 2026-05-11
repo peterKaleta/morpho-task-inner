@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./data": "./src/data/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -13,5 +15,10 @@
   "devDependencies": {
     "typescript": "^5.8.3",
     "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.9",
+    "gql.tada": "^1.9.2",
+    "urql": "^5.0.2"
   }
 }

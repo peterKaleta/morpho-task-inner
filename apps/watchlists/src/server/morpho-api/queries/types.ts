@@ -11,11 +11,9 @@ export type MorphoChainFields = {
 
 export type MorphoMarketStateFields = {
   borrowApy: number | null;
-  borrowAssetsUsd: number | null;
   supplyApy: number | null;
-  supplyAssetsUsd: number | null;
-  liquidityAssetsUsd: number | null;
-  utilization: number | null;
+  totalLiquidity: string | null;
+  totalMarketSize: string | null;
 };
 
 export type MorphoMarketFields = {

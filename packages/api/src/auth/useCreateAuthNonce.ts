@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 
-import { requestJson } from "@/api-client/helpers";
+import { requestJson } from "./client";
 import type { AuthNonceResponse } from "./types";
 
 export function useCreateAuthNonce() {

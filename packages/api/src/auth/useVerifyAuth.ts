@@ -2,9 +2,9 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { requestJson } from "@/api-client/helpers";
-import { authMeQueryKey } from "./useAuthMe";
+import { requestJson } from "./client";
 import type { VerifyAuthInput, VerifyAuthResponse } from "./types";
+import { authMeQueryKey } from "./useAuthMe";
 
 export function useVerifyAuth() {
   const queryClient = useQueryClient();
