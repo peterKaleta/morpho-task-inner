@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { getAuthApiUrl } from "../config";
 import { requestJson } from "./client";
 import type { VerifyAuthInput, VerifyAuthResponse } from "./types";
 import { authMeQueryKey } from "./useAuthMe";
@@ -11,7 +12,7 @@ export function useVerifyAuth() {
 
   return useMutation({
     mutationFn: (input: VerifyAuthInput) =>
-      requestJson<VerifyAuthResponse>("/api/auth/verify", {
+      requestJson<VerifyAuthResponse>(getAuthApiUrl("verify"), {
         method: "POST",
         body: JSON.stringify(input),
       }),

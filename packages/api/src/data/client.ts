@@ -7,11 +7,13 @@ import {
   type TypedDocumentNode,
 } from "urql";
 
+import { graphqlApiUrl } from "../config";
+
 let browserClient: Client | null = null;
 
 export function getGraphqlClient(): Client {
   browserClient ??= createClient({
-    url: "/api/graphql",
+    url: graphqlApiUrl,
     exchanges: [cacheExchange, fetchExchange],
     fetchOptions: {
       credentials: "same-origin",

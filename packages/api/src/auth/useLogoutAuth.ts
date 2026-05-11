@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { getAuthApiUrl } from "../config";
 import { requestJson } from "./client";
 import type { AuthMeResponse } from "./types";
 import { authMeQueryKey } from "./useAuthMe";
@@ -11,7 +12,7 @@ export function useLogoutAuth() {
 
   return useMutation({
     mutationFn: () =>
-      requestJson<{ ok: true }>("/api/auth/logout", {
+      requestJson<{ ok: true }>(getAuthApiUrl("logout"), {
         method: "POST",
       }),
     onSuccess: () => {

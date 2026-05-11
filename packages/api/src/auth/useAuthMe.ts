@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { getAuthApiUrl } from "../config";
 import { requestJson } from "./client";
 import type { AuthMeResponse } from "./types";
 
@@ -11,7 +12,7 @@ export function useAuthMe() {
   return useQuery({
     queryKey: authMeQueryKey,
     queryFn: () =>
-      requestJson<AuthMeResponse>("/api/auth/me", {
+      requestJson<AuthMeResponse>(getAuthApiUrl("me"), {
         cache: "no-store",
       }),
   });
