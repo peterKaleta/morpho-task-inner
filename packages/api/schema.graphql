@@ -20,6 +20,7 @@ type Market {
   collateralAsset: MarketAsset
   lltv: String
   state: MarketState
+  watchlistCount: Int!
 }
 
 type MarketChain {
@@ -45,6 +46,7 @@ type WatchlistSummary {
   name: String!
   description: String
   itemCount: Int!
+  marketUniqueKeys: [ID!]!
   createdAt: String!
   updatedAt: String!
 }

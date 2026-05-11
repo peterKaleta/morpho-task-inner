@@ -19,6 +19,7 @@ export const ADD_MARKET_TO_WATCHLIST_MUTATION = graphql(`
       createdAt
       market {
         marketId
+        watchlistCount
       }
     }
   }

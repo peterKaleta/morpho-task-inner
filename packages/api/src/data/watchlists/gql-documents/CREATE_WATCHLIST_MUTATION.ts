@@ -18,6 +18,7 @@ export const CREATE_WATCHLIST_MUTATION = graphql(`
       name
       description
       itemCount
+      marketUniqueKeys
       createdAt
       updatedAt
     }

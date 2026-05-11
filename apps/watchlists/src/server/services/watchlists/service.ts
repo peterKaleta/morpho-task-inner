@@ -12,6 +12,7 @@ import {
 import {
   createUserWatchlist,
   createWatchlistItem,
+  countUserWatchlistsContainingMarket,
   deleteUserWatchlist,
   findActiveWatchlist,
   findActiveWatchlistItem,
@@ -22,7 +23,11 @@ import {
 } from "./repository";
 import type { WatchlistDetail, WatchlistItem, WatchlistSummary } from "./types";
 
-export { getUserWatchlist, listUserWatchlists };
+export {
+  countUserWatchlistsContainingMarket,
+  getUserWatchlist,
+  listUserWatchlists,
+};
 
 export async function createWatchlist(
   input: {

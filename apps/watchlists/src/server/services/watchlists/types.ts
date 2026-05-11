@@ -5,6 +5,7 @@ export type WatchlistSummary = {
   name: string;
   description: string | null;
   itemCount: number;
+  marketUniqueKeys: string[];
   createdAt: string;
   updatedAt: string;
 };

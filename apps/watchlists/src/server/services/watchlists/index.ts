@@ -1,5 +1,6 @@
 export {
   addMarketToWatchlist,
+  countUserWatchlistsContainingMarket,
   createWatchlist,
   deleteWatchlist,
   getUserWatchlist,

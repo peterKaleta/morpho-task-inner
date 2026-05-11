@@ -32,6 +32,8 @@ export async function listUserWatchlists(
       createdAt: watchlists.createdAt,
       updatedAt: watchlists.updatedAt,
       itemCount: sql<number>`cast(count(${watchlistItems.id}) as int)`,
+      marketUniqueKeys:
+        sql<string[]>`coalesce(array_remove(array_agg(${watchlistItems.marketUniqueKey}), null), '{}')`,
     })
     .from(watchlists)
     .leftJoin(
@@ -53,9 +55,34 @@ export async function listUserWatchlists(
 
   return rows.map((row) => ({
     ...row,
+    marketUniqueKeys: row.marketUniqueKeys ?? [],
     createdAt: toIsoString(row.createdAt),
     updatedAt: toIsoString(row.updatedAt),
   }));
+}
+
+export async function countUserWatchlistsContainingMarket(
+  input: { userId: string; marketUniqueKey: string },
+  db: Database = getDb(),
+): Promise<number> {
+  const [row] = await db
+    .select({
+      value: sql<number>`cast(count(distinct ${watchlists.id}) as int)`,
+    })
+    .from(watchlists)
+    .innerJoin(
+      watchlistItems,
+      and(
+        eq(watchlistItems.watchlistId, watchlists.id),
+        eq(watchlistItems.marketUniqueKey, input.marketUniqueKey),
+        isNull(watchlistItems.deletedAt),
+      ),
+    )
+    .where(
+      and(eq(watchlists.userId, input.userId), isNull(watchlists.deletedAt)),
+    );
+
+  return row?.value ?? 0;
 }
 
 export async function getUserWatchlist(
@@ -124,6 +151,7 @@ export async function createUserWatchlist(
   return {
     ...watchlist,
     itemCount: 0,
+    marketUniqueKeys: [],
     createdAt: toIsoString(watchlist.createdAt),
     updatedAt: toIsoString(watchlist.updatedAt),
   };
@@ -173,6 +201,7 @@ export async function updateUserWatchlist(
     summary ?? {
       ...watchlist,
       itemCount: 0,
+      marketUniqueKeys: [],
       createdAt: toIsoString(watchlist.createdAt),
       updatedAt: toIsoString(watchlist.updatedAt),
     }

@@ -23,6 +23,7 @@ export type Market = {
   collateralAsset: MarketAsset | null;
   lltv: string | null;
   state: MarketState | null;
+  watchlistCount: number;
 };
 
 export type WatchlistSummary = {
@@ -30,6 +31,7 @@ export type WatchlistSummary = {
   name: string;
   description: string | null;
   itemCount: number;
+  marketUniqueKeys: string[];
   createdAt: string;
   updatedAt: string;
 };

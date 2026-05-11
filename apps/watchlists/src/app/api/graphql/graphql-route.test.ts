@@ -156,6 +156,44 @@ describe("GraphQL market endpoint", () => {
     expect(getMorphoMarket).toHaveBeenCalledWith("0xmarket");
   });
 
+  it("returns signed-in market watchlist counts", async () => {
+    const getMorphoMarkets = vi.fn(async () => [market]);
+    const countUserWatchlistsContainingMarket = vi.fn(async () => 2);
+    vi.doMock("@/server/services/auth/current-user", () => ({
+      getCurrentUser: vi.fn(async () => currentUser),
+    }));
+    vi.doMock("@/server/services/markets/service", () => ({
+      getMorphoMarket: vi.fn(),
+      getMorphoMarkets,
+    }));
+    vi.doMock("@/server/services/watchlists", () => ({
+      countUserWatchlistsContainingMarket,
+    }));
+
+    const response = await postGraphql(`
+      query {
+        markets {
+          marketId
+          watchlistCount
+        }
+      }
+    `);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.errors).toBeUndefined();
+    expect(body.data.markets).toEqual([
+      {
+        marketId: "0xmarket",
+        watchlistCount: 2,
+      },
+    ]);
+    expect(countUserWatchlistsContainingMarket).toHaveBeenCalledWith({
+      userId: currentUser.id,
+      marketUniqueKey: "0xmarket",
+    });
+  });
+
   it("returns null when market detail is missing", async () => {
     vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
@@ -263,6 +301,7 @@ describe("GraphQL watchlist endpoint", () => {
         name: "Blue chips",
         description: "Main markets",
         itemCount: 2,
+        marketUniqueKeys: ["0xmarket", "0xother"],
         createdAt: "2026-05-11T08:00:00.000Z",
         updatedAt: "2026-05-11T08:00:00.000Z",
       },
@@ -284,6 +323,7 @@ describe("GraphQL watchlist endpoint", () => {
           id
           name
           itemCount
+          marketUniqueKeys
         }
       }
     `);
@@ -296,6 +336,7 @@ describe("GraphQL watchlist endpoint", () => {
         id: "00000000-0000-4000-8000-000000000101",
         name: "Blue chips",
         itemCount: 2,
+        marketUniqueKeys: ["0xmarket", "0xother"],
       },
     ]);
     expect(listUserWatchlists).toHaveBeenCalledWith(currentUser.id);

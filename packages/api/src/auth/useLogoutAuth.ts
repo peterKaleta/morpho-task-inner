@@ -16,6 +16,8 @@ export function useLogoutAuth() {
       }),
     onSuccess: () => {
       queryClient.setQueryData<AuthMeResponse>(authMeQueryKey, { user: null });
+      void queryClient.invalidateQueries({ queryKey: ["markets"] });
+      void queryClient.invalidateQueries({ queryKey: ["market"] });
     },
   });
 }

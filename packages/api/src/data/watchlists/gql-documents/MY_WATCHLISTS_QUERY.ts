@@ -16,6 +16,7 @@ export const MY_WATCHLISTS_QUERY = graphql(`
       name
       description
       itemCount
+      marketUniqueKeys
       createdAt
       updatedAt
     }

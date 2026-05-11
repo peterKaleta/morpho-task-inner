@@ -40,6 +40,7 @@ export const WATCHLIST_QUERY = graphql(`
             decimals
           }
           lltv
+          watchlistCount
           state {
             supplyApy
             borrowApy

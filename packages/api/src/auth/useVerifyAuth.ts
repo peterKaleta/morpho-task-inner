@@ -17,6 +17,8 @@ export function useVerifyAuth() {
       }),
     onSuccess: (data) => {
       queryClient.setQueryData(authMeQueryKey, { user: data.user });
+      void queryClient.invalidateQueries({ queryKey: ["markets"] });
+      void queryClient.invalidateQueries({ queryKey: ["market"] });
     },
   });
 }

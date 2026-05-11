@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { useRemoveMarketFromWatchlistMutation } from "@pk-task/api/data";
+import { toast } from "@pk-task/ui/components/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,11 +21,13 @@ export function RemoveWatchlistItemDialog({
   marketLabel,
   marketUniqueKey,
   watchlistId,
+  watchlistName,
 }: {
   children: React.ReactNode;
   marketLabel: string;
   marketUniqueKey: string;
   watchlistId: string;
+  watchlistName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +38,22 @@ export function RemoveWatchlistItemDialog({
 
     try {
       await removeMarket.mutateAsync({ watchlistId, marketUniqueKey });
+      toast.success("Market removed", {
+        description: watchlistName
+          ? `Removed from ${watchlistName}.`
+          : "Removed from watchlist.",
+      });
       setOpen(false);
     } catch (caughtError) {
-      setError(
+      const message =
         caughtError instanceof Error
           ? caughtError.message
-          : "Could not remove this market.",
-      );
+          : "Could not remove this market.";
+
+      setError(message);
+      toast.error("Could not remove market", {
+        description: message,
+      });
     }
   }
 

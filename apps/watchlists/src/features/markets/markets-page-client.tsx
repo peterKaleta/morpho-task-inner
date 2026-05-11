@@ -250,10 +250,13 @@ function MarketTable({ markets }: { markets: Market[] }) {
                   >
                     <Button
                       variant="ghost"
-                      size="icon"
-                      aria-label={`Add ${market.marketId} to watchlist`}
+                      size="sm"
+                      aria-label={`Manage watchlists for ${market.marketId}. Saved in ${
+                        market.watchlistCount
+                      } watchlists.`}
                     >
                       <BookmarkPlus className="size-4" aria-hidden="true" />
+                      <span>{market.watchlistCount}</span>
                     </Button>
                   </AddToWatchlistDialog>
                   <Button asChild variant="ghost" size="icon">

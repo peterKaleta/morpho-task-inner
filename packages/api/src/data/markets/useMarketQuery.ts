@@ -34,6 +34,7 @@ export const MARKET_QUERY = graphql(`
         decimals
       }
       lltv
+      watchlistCount
       state {
         supplyApy
         borrowApy

@@ -5,6 +5,7 @@ import { getMorphoMarket, getMorphoMarkets } from "@/server/services/markets/ser
 import type { CurrentUser } from "@/server/services/auth/current-user";
 import {
   addMarketToWatchlist,
+  countUserWatchlistsContainingMarket,
   createWatchlist,
   deleteWatchlist,
   getUserWatchlist,
@@ -41,6 +42,7 @@ export const typeDefs = /* GraphQL */ `
     collateralAsset: MarketAsset
     lltv: String
     state: MarketState
+    watchlistCount: Int!
   }
 
   type MarketChain {
@@ -66,6 +68,7 @@ export const typeDefs = /* GraphQL */ `
     name: String!
     description: String
     itemCount: Int!
+    marketUniqueKeys: [ID!]!
     createdAt: String!
     updatedAt: String!
   }
@@ -253,6 +256,22 @@ export const schema = createSchema<GraphqlContext>({
             userId: currentUser.id,
             watchlistId: args.input.watchlistId,
             marketUniqueKey: args.input.marketUniqueKey,
+          });
+        } catch (error) {
+          throw toGraphqlError(error);
+        }
+      },
+    },
+    Market: {
+      watchlistCount: async (parent: { marketId: string }, _args, context) => {
+        try {
+          if (!context.currentUser) {
+            return 0;
+          }
+
+          return await countUserWatchlistsContainingMarket({
+            userId: context.currentUser.id,
+            marketUniqueKey: parent.marketId,
           });
         } catch (error) {
           throw toGraphqlError(error);

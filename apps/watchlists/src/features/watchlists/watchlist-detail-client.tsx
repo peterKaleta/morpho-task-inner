@@ -124,6 +124,7 @@ export function WatchlistDetailClient({ watchlistId }: { watchlistId: string }) 
           ) : (
             <SavedMarketsTable
               items={watchlist.items}
+              watchlistName={watchlist.name}
               watchlistId={watchlist.id}
             />
           )}
@@ -135,9 +136,11 @@ export function WatchlistDetailClient({ watchlistId }: { watchlistId: string }) 
 
 function SavedMarketsTable({
   items,
+  watchlistName,
   watchlistId,
 }: {
   items: WatchlistItem[];
+  watchlistName: string;
   watchlistId: string;
 }) {
   return (
@@ -161,6 +164,7 @@ function SavedMarketsTable({
                 <SavedMarketRow
                   key={item.id}
                   item={item}
+                  watchlistName={watchlistName}
                   watchlistId={watchlistId}
                 />
               ))}
@@ -174,9 +178,11 @@ function SavedMarketsTable({
 
 function SavedMarketRow({
   item,
+  watchlistName,
   watchlistId,
 }: {
   item: WatchlistItem;
+  watchlistName: string;
   watchlistId: string;
 }) {
   const market = item.market;
@@ -217,6 +223,7 @@ function SavedMarketRow({
       <TableCell className="text-right">
         <RemoveWatchlistItemDialog
           watchlistId={watchlistId}
+          watchlistName={watchlistName}
           marketUniqueKey={item.marketUniqueKey}
           marketLabel={marketLabel}
         >

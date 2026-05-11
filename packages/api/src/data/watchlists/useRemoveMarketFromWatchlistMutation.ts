@@ -18,6 +18,10 @@ export function useRemoveMarketFromWatchlistMutation() {
     ) => mutateGraphql(REMOVE_MARKET_FROM_WATCHLIST_MUTATION, { input }),
     onSuccess: async (_data, input) => {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["markets"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["market", input.marketUniqueKey],
+        }),
         queryClient.invalidateQueries({ queryKey: watchlistsQueryKey }),
         queryClient.invalidateQueries({
           queryKey: watchlistQueryKey(input.watchlistId),

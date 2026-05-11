@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "@pk-task/ui/components/sonner";
 import { AppQueryClientProvider } from "@/providers/query-client-provider";
 import { SessionProvider } from "@/providers/session-provider";
 import { WalletAuthProvider } from "@/providers/wallet-auth/wallet-auth-provider";
@@ -22,6 +23,7 @@ export default function RootLayout({
           <WalletAuthProvider>
             <SessionProvider>
               <Shell>{children}</Shell>
+              <Toaster richColors />
             </SessionProvider>
           </WalletAuthProvider>
         </AppQueryClientProvider>
