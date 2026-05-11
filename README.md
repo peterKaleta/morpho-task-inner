@@ -1,8 +1,12 @@
 # Morpho Market Watchlists
 
-![Architecture](docs/architecture.jpeg)
+## Table of contents
 
-[Vercel deployment placeholder](https://your-vercel-deployment-url.vercel.app)
+## App & artifacts
+- [Live app](https://morpho-task-inner-watchlists.vercel.app/)
+
+- [Business Case Docs](docs/BusinessCase.md)
+![Architecture](docs/architecture.jpeg)
 
 Morpho Market Watchlists is a small fullstack app for organizing and monitoring Morpho markets. Users can browse live Morpho market data, sign in with a wallet, create named watchlists, and save markets into those lists so they can compare opportunities or revisit markets later.
 
