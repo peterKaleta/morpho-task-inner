@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   getClearSessionCookieOptions,
   SESSION_COOKIE_NAME,
-} from "@/server/auth/session";
+} from "@/server/services/auth/session";
 
 export const runtime = "nodejs";
 

@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { isAuthError } from "@/server/auth/errors";
+import { isAuthError } from "@/server/services/auth/errors";
 import {
   createSessionPayload,
   getSessionCookieOptions,
   SESSION_COOKIE_NAME,
   signSessionPayload,
-} from "@/server/auth/session";
-import { verifyWalletSignature } from "@/server/auth/service";
-import { verifyRequestSchema } from "@/server/auth/validation";
+} from "@/server/services/auth/session";
+import { verifyWalletSignature } from "@/server/services/auth/service";
+import { verifyRequestSchema } from "@/server/services/auth/validation";
 
 export const runtime = "nodejs";
 

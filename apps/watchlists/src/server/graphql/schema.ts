@@ -1,6 +1,6 @@
 import { createSchema } from "graphql-yoga";
 
-import { getMorphoMarket, getMorphoMarkets } from "@/server/morpho-api/service";
+import { getMorphoMarket, getMorphoMarkets } from "@/server/services/markets/service";
 
 import type { GraphqlContext } from "./context";
 import { toGraphqlError } from "./errors";

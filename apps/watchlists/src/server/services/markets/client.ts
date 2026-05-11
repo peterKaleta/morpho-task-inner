@@ -1,4 +1,4 @@
-import { config as defaultConfig, type Config } from "../../../config-server";
+import { config as defaultConfig, type Config } from "../../../../config-server";
 
 import { MorphoApiError, type MorphoGraphqlError } from "./errors";
 

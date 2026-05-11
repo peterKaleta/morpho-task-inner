@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 
-import { isMorphoApiError } from "@/server/morpho-api/errors";
+import { isMorphoApiError } from "@/server/services/markets/errors";
 
 export const MORPHO_MARKET_DATA_ERROR_CODE = "MORPHO_MARKET_DATA_ERROR";
 

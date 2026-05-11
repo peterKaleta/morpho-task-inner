@@ -36,8 +36,8 @@ describe("GraphQL market endpoint", () => {
   });
 
   afterEach(() => {
-    vi.doUnmock("@/server/auth/current-user");
-    vi.doUnmock("@/server/morpho-api/service");
+    vi.doUnmock("@/server/services/auth/current-user");
+    vi.doUnmock("@/server/services/markets/service");
     vi.unstubAllEnvs();
     vi.resetModules();
   });
@@ -45,10 +45,10 @@ describe("GraphQL market endpoint", () => {
   it("returns markets from the Morpho service", async () => {
     const getMorphoMarkets = vi.fn(async () => [market]);
     const getMorphoMarket = vi.fn();
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
-    vi.doMock("@/server/morpho-api/service", () => ({
+    vi.doMock("@/server/services/markets/service", () => ({
       getMorphoMarket,
       getMorphoMarkets,
     }));
@@ -90,10 +90,10 @@ describe("GraphQL market endpoint", () => {
 
   it("passes search and pagination args to market list reads", async () => {
     const getMorphoMarkets = vi.fn(async () => [market]);
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
-    vi.doMock("@/server/morpho-api/service", () => ({
+    vi.doMock("@/server/services/markets/service", () => ({
       getMorphoMarket: vi.fn(),
       getMorphoMarkets,
     }));
@@ -121,10 +121,10 @@ describe("GraphQL market endpoint", () => {
 
   it("returns market detail from the Morpho service", async () => {
     const getMorphoMarket = vi.fn(async () => market);
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
-    vi.doMock("@/server/morpho-api/service", () => ({
+    vi.doMock("@/server/services/markets/service", () => ({
       getMorphoMarket,
       getMorphoMarkets: vi.fn(),
     }));
@@ -156,10 +156,10 @@ describe("GraphQL market endpoint", () => {
   });
 
   it("returns null when market detail is missing", async () => {
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
-    vi.doMock("@/server/morpho-api/service", () => ({
+    vi.doMock("@/server/services/markets/service", () => ({
       getMorphoMarket: vi.fn(async () => null),
       getMorphoMarkets: vi.fn(),
     }));
@@ -182,11 +182,11 @@ describe("GraphQL market endpoint", () => {
   });
 
   it("returns a stable error code for Morpho API failures", async () => {
-    const { MorphoApiError } = await import("@/server/morpho-api/errors");
-    vi.doMock("@/server/auth/current-user", () => ({
+    const { MorphoApiError } = await import("@/server/services/markets/errors");
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
-    vi.doMock("@/server/morpho-api/service", () => ({
+    vi.doMock("@/server/services/markets/service", () => ({
       getMorphoMarket: vi.fn(),
       getMorphoMarkets: vi.fn(async () => {
         throw new MorphoApiError("Upstream failed.", { status: 502 });
@@ -213,12 +213,12 @@ describe("GraphQL market endpoint", () => {
 
 describe("GraphQL context", () => {
   afterEach(() => {
-    vi.doUnmock("@/server/auth/current-user");
+    vi.doUnmock("@/server/services/auth/current-user");
     vi.resetModules();
   });
 
   it("returns a null current user for anonymous requests", async () => {
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => null),
     }));
     const { createGraphqlContext } = await import("@/server/graphql/context");
@@ -231,7 +231,7 @@ describe("GraphQL context", () => {
   });
 
   it("returns the current user from a signed request", async () => {
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => ({
         id: "00000000-0000-4000-8000-000000000001",
         walletAddress: "0x0000000000000000000000000000000000000001",

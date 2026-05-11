@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 
 import { authNonces, getDb, type Database } from "@pk-task/db";
 
-import { config } from "../../../config-server";
+import { config } from "../../../../config-server";
 import { normalizeWalletAddress } from "./address";
 
 const APP_NAME = "Morpho Market Watchlists";

@@ -1,4 +1,4 @@
-import { getCurrentUser, type CurrentUser } from "@/server/auth/current-user";
+import { getCurrentUser, type CurrentUser } from "@/server/services/auth/current-user";
 
 export type GraphqlContext = {
   currentUser: CurrentUser | null;

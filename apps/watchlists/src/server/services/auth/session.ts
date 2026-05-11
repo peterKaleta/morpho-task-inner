@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { z } from "@pk-task/shared/text-helpers";
 
-import { config } from "../../../config-server";
+import { config } from "../../../../config-server";
 
 export const SESSION_COOKIE_NAME = "morpho_watchlists_session";
 export const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;

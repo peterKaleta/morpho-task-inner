@@ -15,14 +15,14 @@ describe("auth REST routes", () => {
   });
 
   afterEach(() => {
-    vi.doUnmock("@/server/auth/service");
-    vi.doUnmock("@/server/auth/current-user");
+    vi.doUnmock("@/server/services/auth/service");
+    vi.doUnmock("@/server/services/auth/current-user");
     vi.unstubAllEnvs();
     vi.resetModules();
   });
 
   it("creates a nonce", async () => {
-    vi.doMock("@/server/auth/service", () => ({
+    vi.doMock("@/server/services/auth/service", () => ({
       createAuthNonce: vi.fn(async () => ({
         nonce: "nonce-value",
         message: "message-to-sign",
@@ -44,7 +44,7 @@ describe("auth REST routes", () => {
   });
 
   it("rejects malformed nonce requests", async () => {
-    vi.doMock("@/server/auth/service", () => ({
+    vi.doMock("@/server/services/auth/service", () => ({
       createAuthNonce: vi.fn(),
     }));
 
@@ -55,7 +55,7 @@ describe("auth REST routes", () => {
   });
 
   it("sets a session cookie after wallet verification", async () => {
-    vi.doMock("@/server/auth/service", () => ({
+    vi.doMock("@/server/services/auth/service", () => ({
       verifyWalletSignature: vi.fn(async () => ({
         id: "00000000-0000-4000-8000-000000000001",
         walletAddress: validWalletAddress,
@@ -84,9 +84,9 @@ describe("auth REST routes", () => {
   });
 
   it("returns 401 for rejected wallet verification", async () => {
-    const { AuthError } = await import("@/server/auth/errors");
+    const { AuthError } = await import("@/server/services/auth/errors");
 
-    vi.doMock("@/server/auth/service", () => ({
+    vi.doMock("@/server/services/auth/service", () => ({
       verifyWalletSignature: vi.fn(async () => {
         throw new AuthError("Invalid wallet signature.");
       }),
@@ -114,7 +114,7 @@ describe("auth REST routes", () => {
   });
 
   it("returns the current user", async () => {
-    vi.doMock("@/server/auth/current-user", () => ({
+    vi.doMock("@/server/services/auth/current-user", () => ({
       getCurrentUser: vi.fn(async () => ({
         id: "00000000-0000-4000-8000-000000000001",
         walletAddress: validWalletAddress,

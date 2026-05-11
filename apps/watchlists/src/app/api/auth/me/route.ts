@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/server/auth/current-user";
+import { getCurrentUser } from "@/server/services/auth/current-user";
 
 export const runtime = "nodejs";
 

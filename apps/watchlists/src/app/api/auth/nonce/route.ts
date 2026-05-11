@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { isAuthError } from "@/server/auth/errors";
-import { createAuthNonce } from "@/server/auth/service";
-import { nonceRequestSchema } from "@/server/auth/validation";
+import { isAuthError } from "@/server/services/auth/errors";
+import { createAuthNonce } from "@/server/services/auth/service";
+import { nonceRequestSchema } from "@/server/services/auth/validation";
 
 export const runtime = "nodejs";
 
